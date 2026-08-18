@@ -124,7 +124,7 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 await loadStats();
 
-app.listen(PORT, () => console.log(`HTTP сервер запущен на порту ${PORT}`));
+app.listen(PORT, (8080) => console.log(`HTTP сервер запущен на порту ${PORT}`));
 
 bot.launch().then(() => console.log('Telegram-бот запущен'));
 
