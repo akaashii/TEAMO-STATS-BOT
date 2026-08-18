@@ -1,17 +1,14 @@
 import { Telegraf } from 'telegraf';
 import express from 'express';
 import cors from 'cors';
-import cron from 'node-cron';
 import fs from 'fs/promises';
 
 const {
   BOT_TOKEN,
   CHAT_ID,
   IRIS_USERNAME = '',
-  CRON_SCHEDULE = '0 */6 * * *',
   PORT = 3000,
   ALLOWED_ORIGIN = '*',
-  STATS_COMMAND = 'Стата вся',
 } = process.env;
 
 if (!BOT_TOKEN || !CHAT_ID) {
@@ -96,28 +93,11 @@ bot.on('message', async (ctx) => {
   }
 });
 
-async function requestStats() {
-  try {
-    await bot.telegram.sendMessage(CHAT_ID, STATS_COMMAND);
-    console.log('Команда отправлена в чат:', STATS_COMMAND);
-  } catch (err) {
-    console.error('Не удалось отправить команду в чат:', err);
-  }
-}
-
-cron.schedule(CRON_SCHEDULE, requestStats);
-
 app.get('/api/stats', (req, res) => {
   if (!latestStats) {
     return res.status(503).json({ error: 'Статистика ещё не получена, попробуйте позже' });
   }
   res.json(latestStats);
-});
-
-// Ручной запуск обновления (для проверки, например /api/refresh?key=...)
-app.get('/api/refresh', async (req, res) => {
-  await requestStats();
-  res.json({ ok: true, message: 'Запрос отправлен в чат, ответ Iris придёт в течение минуты' });
 });
 
 app.get('/health', (req, res) => res.json({ ok: true }));
